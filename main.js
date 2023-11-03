@@ -1,4 +1,3 @@
-import ChromeCast from "chromecast-api";
 import fetch from "node-fetch";
 import express from "express";
 import fs from "fs";
@@ -85,15 +84,7 @@ class Main {
 	}
 
 	static cast() {
-		this.chromecast = new ChromeCast();
-
-		var context = this;
-
-		this.chromecast.on("device", function(device) {
-			if (device.friendlyName == "Sala de TV") {
-				device.play("http://" + os.networkInterfaces().Ethernet[1].address + ":" + context.port);
-			}
-		});
+		console.log("http://" + os.networkInterfaces().Ethernet[1].address + ":" + this.port);
 	}
 }
 
