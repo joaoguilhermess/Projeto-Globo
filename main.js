@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import Cast from "castv2";
 import express from "express";
 import fs from "fs";
 import os from "os";
@@ -88,7 +89,49 @@ class Main {
 	}
 
 	static cast() {
-		console.log("http://" + os.networkInterfaces().Ethernet[1].address + ":" + this.port);
+		var u = "http://" + os.networkInterfaces().Ethernet[1].address + ":" + this.port;
+
+		console.log(u);
+
+		var cast = new Cast.Client();
+
+		cast.connect("192.168.0.102", function() {
+			var connection = cast.createChannel("sender-0", "receiver-0", "urn:x-cast:com.google.cast.tp.connection", "JSON");
+			var heartbeat = cast.createChannel("sender-0", "receiver-0", "urn:x-cast:com.google.cast.tp.heartbeat", "JSON");
+			var receiver = cast.createChannel("sender-0", "receiver-0", "urn:x-cast:com.google.cast.receiver", "JSON");
+
+			connection.send({type: "CONNECT"});
+
+			setInterval(function() {
+				heartbeat.send({type: "PING"});
+			});
+
+			receiver.send({
+				type: "LAUNCH",
+				appId: "5CB45E5A",
+				requestId: 1
+			});
+
+			receiver.on("message", function(data, broadcast) {
+				if (data.type == "RECEIVER_STATUS") {
+					if (data.status.applications) {
+						var transportId = data.status.applications[0].transportId;
+
+						if (transportId && data.status.applications[0].statusText == "URL Cast ready...") {
+							var castConnection = cast.createChannel("sender-0", transportId, "urn:x-cast:com.google.cast.tp.connection", "JSON");
+							var castReceiver = cast.createChannel("sender-0", transportId, "urn:x-cast:com.url.cast");
+
+							castConnection.send({type: "CONNECT"});
+
+							castReceiver.send(JSON.stringify({
+								type: "loc",
+								url: u
+							}));
+						}
+					}
+				}
+			});
+		});
 	}
 }
 
