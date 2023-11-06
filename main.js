@@ -13,6 +13,12 @@ class Main {
 
 		await this.getBase();
 
+		var context = this;
+
+		setInterval(function() {
+			context.getBase();
+		}, 1 * 60 * 1000);
+
 		this.start();
 
 		this.addIndex();
@@ -27,24 +33,32 @@ class Main {
 	static async getBase() {
 		var context = this;
 
-		var f = await fetch("https://playback.video.globo.com/v4/video-session", {
-			"headers": {
-				"accept": "*/*",
-				"accept-language": "en-US,en;q=0.9",
-				"authorization": "Bearer " + context.auth,
-				"cache-control": "no-cache",
-				"content-type": "application/json",
-				"cookie": context.cookie
-			},
-			"body": "{\"player_type\":\"desktop\",\"video_id\":\"4452349\",\"quality\":\"max\",\"content_protection\":\"widevine\",\"vsid\":\"c62efc75-c498-6a55-ddc7-acf22640b3a0\",\"tz\":\"-03:00\"}",
-			"method": "POST"
-		});
+		while (true) {
+			try {
+				var f = await fetch("https://playback.video.globo.com/v4/video-session", {
+					"headers": {
+						"accept": "*/*",
+						"accept-language": "en-US,en;q=0.9",
+						"authorization": "Bearer " + context.auth,
+						"cache-control": "no-cache",
+						"content-type": "application/json",
+						"cookie": context.cookie
+					},
+					"body": "{\"player_type\":\"desktop\",\"video_id\":\"4452349\",\"quality\":\"max\",\"content_protection\":\"widevine\",\"vsid\":\"c62efc75-c498-6a55-ddc7-acf22640b3a0\",\"tz\":\"-03:00\"}",
+					"method": "POST"
+				});
 
-		var json = await f.json();
+				var json = await f.json();
 
-		var url = json.sources[0].url.split("/").slice(0, - 1).join("/") + "/";
+				var url = json.sources[0].url.split("/").slice(0, - 1).join("/") + "/";
 
-		this.baseUrl = url;
+				this.baseUrl = url;
+
+				return;
+			} catch (e) {
+				console.log("E:", e);
+			}
+		}
 	}
 
 	static start() {
@@ -69,22 +83,30 @@ class Main {
 		this.app.get("/playlist.m3u8", async function(req, res) {
 			console.log(decodeURIComponent(req.url));
 
-			var f = await fetch(context.baseUrl +
-				"playlist.m3u8", {
-				"headers": {
-					"accept": "*/*",
-					"accept-language": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7",
-					"cookie": context.cookie
+			while (true) {
+				try {
+					var f = await fetch(context.baseUrl +
+						"playlist.m3u8", {
+						"headers": {
+							"accept": "*/*",
+							"accept-language": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7",
+							"cookie": context.cookie
+						}
+					});
+
+					var text = await f.text();
+
+					text = text.split("globo-ser-audio_1").join("m3u8/globo-ser-audio_1");
+
+					text = text.split("m3u8/globo-ser-audio_1=96000-video=2262976.m3u8")[1];
+
+					res.send(text);
+
+					return;
+				} catch (e) {
+					console.log("E:", e);
 				}
-			});
-
-			var text = await f.text();
-
-			text = text.split("globo-ser-audio_1").join("m3u8/globo-ser-audio_1");
-
-			text = text.split("m3u8/globo-ser-audio_1=96000-video=2262976.m3u8")[1];
-
-			res.send(text);
+			}
 		});
 	}
 
@@ -96,20 +118,28 @@ class Main {
 
 			var url = decodeURIComponent(req.url).split("/")[2];
 
-			var f = await fetch(context.baseUrl +
-				url, {
-				"headers": {
-					"accept": "*/*",
-					"accept-language": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7",
-					"cookie": context.cookie
+			while (true) {
+				try {
+					var f = await fetch(context.baseUrl +
+						url, {
+						"headers": {
+							"accept": "*/*",
+							"accept-language": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7",
+							"cookie": context.cookie
+						}
+					});
+
+					res.set("Cache-Control", "private, max-age=0, no-cache");
+					res.set("Connection", "keep-alive");
+					res.set("Content-Type", "video/MP2T");
+
+					f.body.pipe(res);
+
+					return;
+				} catch (e) {
+					console.log("E:", e);
 				}
-			});
-
-			res.set("Cache-Control", "private, max-age=0, no-cache");
-			res.set("Connection", "keep-alive");
-			res.set("Content-Type", "video/MP2T");
-
-			f.body.pipe(res);
+			}
 		});
 	}
 

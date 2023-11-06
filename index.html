@@ -17,15 +17,26 @@
 			display: flex;
 		}
 
+		@keyframes start {
+			from {
+				background-color: #ffffff;
+			}
+
+			to {
+				background-color: #000000;
+			}
+		}
+
 		body {
 			display: flex;
 			background-color: #000000;
 			overflow: hidden;
+			animation-name: start;
+			animation-duration: 5s;
 		}
 
 		video {
 			display: flex;
-/*			filter: contrast(1.125) brightness(1.125);*/
 		}
 
 		html, body, video {
