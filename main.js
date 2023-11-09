@@ -1,3 +1,5 @@
+import cookieParser from "cookie-parser";
+import {v4 as uuid} from "uuid";
 import fetch from "node-fetch";
 import Cast from "./cast.js";
 import express from "express";
@@ -11,11 +13,15 @@ class Main {
 
 		this.port = 5000;
 
+		this.last = {};
+
 		this.start();
 
 		this.addIndex();
 
 		this.addPlaylist();
+
+		this.addSlice();
 
 		this.addStream();
 
@@ -55,6 +61,8 @@ class Main {
 
 	static start() {
 		this.app = express();
+
+		this.app.use(cookieParser());
 
 		this.app.listen(this.port, function() {
 			console.log("Ready");
@@ -98,7 +106,47 @@ class Main {
 
 					res.set("Cache-Control", "private, max-age=0, no-cache");
 
+					var session = uuid();
+
+					res.cookie("session", session);
+
+					context.last[session] = "";
+
 					res.send(text);
+
+					return;
+				} catch (e) {
+					console.log("E:", e);
+				}
+			}
+		});
+	}
+
+	static addSlice() {
+		var context = this;
+
+		this.app.get("/m3u8/ts/*", async function(req, res) {
+			console.log(decodeURIComponent(req.url));
+
+			var url = decodeURIComponent(req.url).split("/")[3];
+
+			while (true) {
+				try {
+					await context.getBase();
+
+					var f = await fetch(context.baseUrl +
+						url, {
+						"headers": {
+							"accept": "*/*",
+							"accept-language": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7",
+							"cookie": context.cookie
+						}
+					});
+
+					res.set("Cache-Control", "private, max-age=0, no-cache");
+					res.set("Content-Type", "video/MP2T");
+
+					f.body.pipe(res);
 
 					return;
 				} catch (e) {
@@ -129,20 +177,27 @@ class Main {
 						}
 					});
 
-					res.set("Cache-Control", "private, max-age=0, no-cache");
 
-					if (url.includes("ts")) {
-						// res.set("Connection", "keep-alive");
-						res.set("Content-Type", "video/MP2T");
+					var text = await f.text();
 
-						f.body.pipe(res);
-					} else {
-						var text = await f.text();
+					text = text.split("globo-ser-audio_1").join("ts/globo-ser-audio_1");
 
+					var current = text.split("\n");
+
+					current = current[current.length - 2];
+
+					var session = req.cookies.session;
+
+					if (context.last[session] != current) {
+						res.set("Cache-Control", "private, max-age=0, no-cache");
 						res.send(text);
-					}
 
-					return;
+						// console.log(req.cookies.session, "current:", current);
+
+						context.last[session] = current;
+
+						return;
+					}
 				} catch (e) {
 					console.log("E:", e);
 				}
