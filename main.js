@@ -194,6 +194,14 @@ class Main {
 							text += "#EXTINF:4.8, no desc\nts/globo-ser-audio_1=96000-video=3442944-" + (k + i + 1) + ".ts?start_index=2\n";
 						}
 					} else {
+						text = text.split("\n");
+
+						text = text.slice(0, -3 * 2);
+
+						text.push("");
+
+						text = text.join("\n");
+
 						context.started[session] = true;
 					}
 
