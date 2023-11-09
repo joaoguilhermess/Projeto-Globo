@@ -13,7 +13,7 @@ class Main {
 
 		this.port = 5000;
 
-		this.last = {};
+		this.started = {};
 
 		this.start();
 
@@ -110,7 +110,7 @@ class Main {
 
 					res.cookie("session", session);
 
-					context.last[session] = "";
+					context.started[session] = false;
 
 					res.send(text);
 
@@ -177,7 +177,6 @@ class Main {
 						}
 					});
 
-
 					var text = await f.text();
 
 					text = text.split("globo-ser-audio_1").join("ts/globo-ser-audio_1");
@@ -188,16 +187,20 @@ class Main {
 
 					var session = req.cookies.session;
 
-					if (context.last[session] != current) {
-						res.set("Cache-Control", "private, max-age=0, no-cache");
-						res.send(text);
+					if (context.started[session]) {
+						var k = parseInt(current.split("=")[2].split("-")[1].split(".")[0]);
 
-						// console.log(req.cookies.session, "current:", current);
-
-						context.last[session] = current;
-
-						return;
+						for (var i = 0; i < 10; i++) {
+							text += "#EXTINF:4.8, no desc\nts/globo-ser-audio_1=96000-video=3442944-" + (k + i + 1) + ".ts?start_index=2\n";
+						}
+					} else {
+						context.started[session] = true;
 					}
+
+					res.set("Cache-Control", "private, max-age=0, no-cache");
+					res.send(text);
+
+					return;
 				} catch (e) {
 					console.log("E:", e);
 				}
