@@ -33,6 +33,10 @@ class Main {
 
 		while (true) {
 			try {
+				var n = Date.now();
+
+				console.log("Try 1");
+
 				var f = await fetch("https://playback.video.globo.com/v4/video-session", {
 					"headers": {
 						"accept": "*/*",
@@ -51,6 +55,8 @@ class Main {
 				var url = json.sources[0].url.split("/").slice(0, - 1).join("/") + "/";
 
 				this.baseUrl = url;
+
+				console.log(Date.now() - n);
 
 				return;
 			} catch (e) {
@@ -87,6 +93,10 @@ class Main {
 
 			while (true) {
 				try {
+					var n = Date.now();
+
+					console.log("Try 2");
+
 					await context.getBase();
 					
 					var f = await fetch(context.baseUrl +
@@ -114,6 +124,8 @@ class Main {
 
 					res.send(text);
 
+					console.log(Date.now() - n);
+
 					return;
 				} catch (e) {
 					console.log("E:", e);
@@ -132,6 +144,10 @@ class Main {
 
 			while (true) {
 				try {
+					var n = Date.now();
+
+					console.log("Try 3");
+
 					await context.getBase();
 
 					var f = await fetch(context.baseUrl +
@@ -147,6 +163,8 @@ class Main {
 					res.set("Content-Type", "video/MP2T");
 
 					f.body.pipe(res);
+
+					console.log(Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -166,6 +184,10 @@ class Main {
 
 			while (true) {
 				try {
+					var n = Date.now();
+
+					console.log("Try 4");
+
 					await context.getBase();
 
 					var f = await fetch(context.baseUrl +
@@ -196,7 +218,7 @@ class Main {
 					} else {
 						text = text.split("\n");
 
-						text = text.slice(0, -3 * 2);
+						text = text.slice(0, -3 * 3);
 
 						text.push("");
 
@@ -207,6 +229,8 @@ class Main {
 
 					res.set("Cache-Control", "private, max-age=0, no-cache");
 					res.send(text);
+
+					console.log(Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -221,7 +245,7 @@ class Main {
 
 		console.log(u);
 
-		Cast.Init("192.168.0.102", u);
+		Cast.Init("192.168.0.100", u);
 	}
 }
 

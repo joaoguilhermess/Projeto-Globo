@@ -65,8 +65,6 @@ export default class Cast {
 		});
 
 		this.receiver.off("message", r);
-
-		// console.log(status);
 	}
 
 	static async launch(url) {
