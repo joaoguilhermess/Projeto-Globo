@@ -78,11 +78,38 @@
 
 				var context = this;
 
+				var first = true;
+
 				this.player.on("waiting", function(event) {
-					if (context.video.played.length > 0) {
+					if (first) {
+						first = false;
+
 						console.log(event);
 
 						fetch("/paused");
+
+						context.timeout = setTimeout(function() {
+							// window.location.reload();
+
+							context.video.pause();
+
+							setTimeout(function() {
+								// context.video.load();
+
+								first = true;
+
+								context.video.play();
+							}, 50);
+
+						}, 250);
+					}
+				});
+
+				this.player.on("playing", function(event) {
+					if (context.video.timeout) {
+						clearTimeout(context.video.timeout);
+
+						delete context.video.timeout;
 					}
 				});
 			}
