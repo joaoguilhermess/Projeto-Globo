@@ -25,6 +25,8 @@ class Main {
 
 		this.addStream();
 
+		this.addPaused();
+
 		this.cast();
 	}
 
@@ -56,7 +58,7 @@ class Main {
 
 				this.baseUrl = url;
 
-				console.log(Date.now() - n);
+				console.log("t1", Date.now() - n);
 
 				return;
 			} catch (e) {
@@ -124,7 +126,7 @@ class Main {
 
 					res.send(text);
 
-					console.log(Date.now() - n);
+					console.log("t2", Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -164,7 +166,7 @@ class Main {
 
 					f.body.pipe(res);
 
-					console.log(Date.now() - n);
+					console.log("t3", Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -209,34 +211,42 @@ class Main {
 
 					var session = req.cookies.session;
 
-					if (context.started[session]) {
-						var k = parseInt(current.split("=")[2].split("-")[1].split(".")[0]);
+					// if (!context.started[session]) {
+					// 	text = text.split("\n");
 
-						for (var i = 0; i < 10; i++) {
-							text += "#EXTINF:4.8, no desc\nts/globo-ser-audio_1=96000-video=3442944-" + (k + i + 1) + ".ts?start_index=2\n";
-						}
-					} else {
-						text = text.split("\n");
+					// 	text = text.slice(0, -(1 + (2 * 1)));
 
-						text = text.slice(0, -3 * 3);
+					// 	text.push("");
 
-						text.push("");
+					// 	text = text.join("\n");
 
-						text = text.join("\n");
-
-						context.started[session] = true;
-					}
+					// 	context.started[session] = true;
+					// }
 
 					res.set("Cache-Control", "private, max-age=0, no-cache");
 					res.send(text);
 
-					console.log(Date.now() - n);
+					console.log("t4", Date.now() - n);
 
 					return;
 				} catch (e) {
 					console.log("E:", e);
 				}
 			}
+		});
+	}
+
+	static addPaused() {
+		this.paused = 0;
+
+		var context = this;
+
+		this.app.get("/paused", function(req, res) {
+			context.paused += 1;
+
+			console.log("Times Paused:", context.paused);
+
+			res.sendStatus(200);
 		});
 	}
 
