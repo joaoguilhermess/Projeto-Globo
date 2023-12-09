@@ -27,6 +27,8 @@ class Main {
 
 		this.addPaused();
 
+		this.addLog();
+
 		this.cast();
 	}
 
@@ -37,7 +39,7 @@ class Main {
 			try {
 				var n = Date.now();
 
-				console.log("Try 1");
+				// console.log("Try 1");
 
 				var f = await fetch("https://playback.video.globo.com/v4/video-session", {
 					"headers": {
@@ -58,7 +60,7 @@ class Main {
 
 				this.baseUrl = url;
 
-				console.log("t1", Date.now() - n);
+				// console.log("t1", Date.now() - n);
 
 				return;
 			} catch (e) {
@@ -71,6 +73,8 @@ class Main {
 		this.app = express();
 
 		this.app.use(cookieParser());
+
+		this.app.use(express.json());
 
 		this.app.listen(this.port, function() {
 			console.log("Ready");
@@ -97,7 +101,7 @@ class Main {
 				try {
 					var n = Date.now();
 
-					console.log("Try 2");
+					// console.log("Try 2");
 
 					await context.getBase();
 					
@@ -126,7 +130,7 @@ class Main {
 
 					res.send(text);
 
-					console.log("t2", Date.now() - n);
+					// console.log("t2", Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -148,7 +152,7 @@ class Main {
 				try {
 					var n = Date.now();
 
-					console.log("Try 3");
+					// console.log("Try 3");
 
 					await context.getBase();
 
@@ -166,7 +170,7 @@ class Main {
 
 					f.body.pipe(res);
 
-					console.log("t3", Date.now() - n);
+					// console.log("t3", Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -188,7 +192,7 @@ class Main {
 				try {
 					var n = Date.now();
 
-					console.log("Try 4");
+					// console.log("Try 4");
 
 					await context.getBase();
 
@@ -211,22 +215,22 @@ class Main {
 
 					var session = req.cookies.session;
 
-					// if (!context.started[session]) {
-					// 	text = text.split("\n");
+					if (!context.started[session]) {
+						text = text.split("\n");
 
-					// 	text = text.slice(0, -(1 + (2 * 1)));
+						text = text.slice(0, -(1 + (2 * 1)));
 
-					// 	text.push("");
+						text.push("");
 
-					// 	text = text.join("\n");
+						text = text.join("\n");
 
-					// 	context.started[session] = true;
-					// }
+						context.started[session] = true;
+					}
 
 					res.set("Cache-Control", "private, max-age=0, no-cache");
 					res.send(text);
 
-					console.log("t4", Date.now() - n);
+					// console.log("t4", Date.now() - n);
 
 					return;
 				} catch (e) {
@@ -245,6 +249,14 @@ class Main {
 			context.paused += 1;
 
 			console.log("Times Paused:", context.paused);
+
+			res.sendStatus(200);
+		});
+	}
+
+	static addLog() {
+		this.app.post("/log", function(req, res) {
+			console.log("Log:", req.body.text);
 
 			res.sendStatus(200);
 		});

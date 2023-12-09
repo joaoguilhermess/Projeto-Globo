@@ -70,6 +70,22 @@
 		<source src="playlist.m3u8" type="application/x-mpegURL">
 	</video>
 	<script type="text/javascript">
+		var l = function(...args) {
+			fetch("/log", {
+				headers: {
+					"Content-Type": "application/json"
+				},
+				method: "POST",
+				body: JSON.stringify({text: args.join(" ")})
+			});
+		}
+
+		console.debug = l;
+		console.error = l;
+		console.info = l;
+		console.log = l;
+		console.warn = l;
+
 		class Globo {
 			static Init() {
 				this.video = document.querySelector("video");
@@ -81,27 +97,18 @@
 				var first = true;
 
 				this.player.on("waiting", function(event) {
-					if (first) {
-						first = false;
-
-						console.log(event);
-
+					if (!first) {
 						fetch("/paused");
 
 						context.timeout = setTimeout(function() {
-							// window.location.reload();
-
 							context.video.pause();
 
 							setTimeout(function() {
-								// context.video.load();
-
-								first = true;
-
 								context.video.play();
-							}, 50);
-
-						}, 250);
+							}, 100);
+						}, 500);
+					} else {
+						first = false;
 					}
 				});
 
