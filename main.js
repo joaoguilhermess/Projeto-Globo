@@ -148,7 +148,7 @@ class Main {
 
 			var url = decodeURIComponent(req.url).split("/")[3];
 
-			while (true) {
+			// while (true) {
 				try {
 					var n = Date.now();
 
@@ -175,8 +175,10 @@ class Main {
 					return;
 				} catch (e) {
 					console.log("E:", e);
+
+					res.sendStatus(404);
 				}
-			}
+			// }
 		});
 	}
 
@@ -188,7 +190,7 @@ class Main {
 
 			var url = decodeURIComponent(req.url).split("/")[2];
 
-			while (true) {
+			// while (true) {
 				try {
 					var n = Date.now();
 
@@ -218,7 +220,7 @@ class Main {
 					if (!context.started[session]) {
 						text = text.split("\n");
 
-						text = text.slice(0, -(1 + (2 * 1)));
+						text = text.slice(0, -(1 + (2 * 2)));
 
 						text.push("");
 
@@ -235,8 +237,10 @@ class Main {
 					return;
 				} catch (e) {
 					console.log("E:", e);
+
+					res.sendStatus(404);
 				}
-			}
+			// }
 		});
 	}
 
