@@ -61,8 +61,8 @@
 		}
 	</style>
 	<script>window.HELP_IMPROVE_VIDEOJS = false;</script>
-	<link href="//vjs.zencdn.net/8.6.1/video-js.min.css" rel="stylesheet">
-	<script src="//vjs.zencdn.net/8.6.1/video.min.js"></script>
+	<link href="//vjs.zencdn.net/8.7.0/video-js.min.css" rel="stylesheet">
+	<script src="//vjs.zencdn.net/8.7.0/video.min.js"></script>
 </head>
 <body>
 	<div class="loading">Carregando...</div>
@@ -105,8 +105,8 @@
 
 							setTimeout(function() {
 								context.video.play();
-							}, 50);
-						}, 250);
+							}, 1000/30);
+						}, 1000/2);
 					} else {
 						first = false;
 					}

@@ -220,7 +220,7 @@ class Main {
 					if (!context.started[session]) {
 						text = text.split("\n");
 
-						text = text.slice(0, -(1 + (2 * 2)));
+						text = text.slice(0, -(1 + (2 * 4)));
 
 						text.push("");
 
@@ -271,7 +271,7 @@ class Main {
 
 		console.log(u);
 
-		Cast.Init("192.168.0.100", u);
+		Cast.Init("192.168.0.103", u);
 	}
 }
 
