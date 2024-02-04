@@ -99,31 +99,49 @@
 
 				var context = this;
 
-				var first = true;
+				// var first = true;
 
-				this.player.on("waiting", function(event) {
-					if (!first) {
-						fetch("/paused");
+				var last = 0;
 
-						context.timeout = setTimeout(function() {
-							context.video.pause();
-
-							setTimeout(function() {
-								context.video.play();
-							}, 1000/30);
-						}, 1000/2);
+				setInterval(function() {
+					if (last == context.video.currentTime) {
+						if (!context.timeout) {
+							context.timeout = setTimeout(function() {
+								window.location.reload();
+							}, 1000 * 5);
+						}
 					} else {
-						first = false;
-					}
-				});
+						if (context.timeout) {
+							clearTimeout(context.timeout);
 
-				this.player.on("playing", function(event) {
-					if (context.video.timeout) {
-						clearTimeout(context.video.timeout);
-
-						delete context.video.timeout;
+							delete context.timeout;
+						}
 					}
-				});
+
+					last = context.video.currentTime;
+				}, 1000/10);
+
+				// this.player.on("waiting", function(event) {
+				// 	if (!first) {
+				// 		fetch("/paused");
+
+				// 		if (!context.timeout) {
+				// 			context.timeout = setTimeout(function() {
+				// 				window.location.reload();
+				// 			}, 1000 * 5);
+				// 		}
+				// 	} else {
+				// 		first = false;
+				// 	}
+				// });
+
+				// this.player.on("playing", function(event) {
+				// 	if (context.video.timeout) {
+				// 		clearTimeout(context.video.timeout);
+
+				// 		delete context.video.timeout;
+				// 	}
+				// });
 			}
 
 			static async start() {

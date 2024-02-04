@@ -30,7 +30,7 @@ class Main {
 
 		this.addStream();
 
-		this.addPaused();
+		// this.addPaused();
 
 		this.addLog();
 
@@ -250,14 +250,34 @@ class Main {
 	}
 
 	static addPaused() {
-		this.paused = 0;
+		this.paused = {};
+		this.timeout = {};
 
 		var context = this;
 
 		this.app.get("/paused", function(req, res) {
-			context.paused += 1;
+			var session = req.cookies.session;
 
-			console.log("Times Paused:", context.paused);
+			if (!context.paused[session]) {
+				context.paused[session] = 0;
+			}
+
+			context.paused[session] += 1;
+
+			console.log("Times Paused:", context.paused[session]);
+
+			// clearInterval(interval);
+
+			if (!context.timeout[session]) {
+				context.timeout[session] = setTimeout(function() {
+					
+				}, 1000 * 5);
+			}
+
+			// if (context.paused >= 50) {
+			// 	// process.exit();
+
+			// }
 
 			res.sendStatus(200);
 		});
