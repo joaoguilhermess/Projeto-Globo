@@ -30,7 +30,7 @@ class Main {
 
 		this.addStream();
 
-		// this.addPaused();
+		this.addPaused();
 
 		this.addLog();
 
@@ -251,7 +251,6 @@ class Main {
 
 	static addPaused() {
 		this.paused = {};
-		this.timeout = {};
 
 		var context = this;
 
@@ -264,20 +263,7 @@ class Main {
 
 			context.paused[session] += 1;
 
-			console.log("Times Paused:", context.paused[session]);
-
-			// clearInterval(interval);
-
-			if (!context.timeout[session]) {
-				context.timeout[session] = setTimeout(function() {
-					
-				}, 1000 * 5);
-			}
-
-			// if (context.paused >= 50) {
-			// 	// process.exit();
-
-			// }
+			console.log("Times", "Paused:", context.paused[session], session);
 
 			res.sendStatus(200);
 		});
