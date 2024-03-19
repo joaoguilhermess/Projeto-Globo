@@ -68,17 +68,27 @@
 </head>
 <body>
 	<div class="loading">Carregando...</div>
-	<video id="video" data-setup="{}">
+	<video id="video" autoplay="true" data-setup="{}">
 		<source id="source" src="playlist.m3u8" type="application/x-mpegURL">
 	</video>
 	<script type="text/javascript">
 		var l = function(...args) {
+			var list = [];
+
+			for (var i = 0; i < args.length; i++) {
+				if (typeof args[i] == "object") {
+					list.push(JSON.stringify(args[i], null, "\t"));
+				} else {
+					list.push(args[i].toString());
+				}
+			}
+
 			fetch("/log", {
 				headers: {
 					"Content-Type": "application/json"
 				},
 				method: "POST",
-				body: JSON.stringify({text: args.join(" ")})
+				body: JSON.stringify({text: list.join(" ")})
 			});
 		}
 
@@ -113,14 +123,16 @@
 									window.location.reload();
 
 									// context.video.pause();
-									// context.source.setAttribute("src", "playlist.m3u8");
 									// context.source.setAttribute("type", "application/x-mpegURL");
+									// context.source.setAttribute("src", "playlist.m3u8");
 									// context.video.load();
 									// context.video.play();
 								}
 							}, 1000 * 5);
 						}
 					} else {
+						context.video.play();
+
 						first = false;
 
 						if (context.timeout) {
@@ -131,7 +143,7 @@
 					}
 
 					last = context.video.currentTime;
-				}, 1000/10);
+				}, 1000/2);
 			}
 
 			static async start() {
