@@ -8,13 +8,13 @@ export default class Cast {
 
 		var app = await this.getApp();
 
-		if (app.appId != "E8C28D3C") {
+		if (app.appId == "E8C28D3C") {
 			console.log(app.displayName);
 
-			await this.stop();
+			// await this.stop();
+		
+			await this.launch(url);
 		}
-
-		await this.launch(url);
 	}
 
 	static async connect(ip) {
