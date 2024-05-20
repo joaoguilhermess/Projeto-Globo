@@ -8,10 +8,10 @@ export default class Cast {
 
 		var app = await this.getApp();
 
-		if (app.appId == "E8C28D3C") {
-			console.log(app.displayName);
+		console.log(app.appId, app.displayName);
 
-			// await this.stop();
+		if (["E8C28D3C", "5CB45E5A"].includes(app.appId)) {
+			await this.stop();
 		
 			await this.launch(url);
 		}
