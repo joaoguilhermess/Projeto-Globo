@@ -1,14 +1,14 @@
 import cast from "castv2";
 
 export default class Cast {
-	static async Init(ip, url) {
+	static async Init(ip, url, log) {
 		this.cast = new cast.Client();
 
 		await this.connect(ip);
 
 		var app = await this.getApp();
 
-		console.log(app.appId, app.displayName);
+		log(app.appId, app.displayName);
 
 		if (["E8C28D3C", "5CB45E5A"].includes(app.appId)) {
 			await this.stop();

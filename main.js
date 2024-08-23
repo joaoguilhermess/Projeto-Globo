@@ -282,11 +282,25 @@ class Globo {
 	}
 
 	static async cast() {
+		var ip;
+
 		if (process.platform == "win32") {
-			var ip = os.networkInterfaces().Ethernet[1].address;
+			let interfaces = os.networkInterfaces();
+			let names = Object.keys(interfaces);
+
+			for (let i = 0; i < names.length; i++) {
+				let int = interfaces[names[i]];
+
+				for (let k = 0; k < int.length; k++) {
+					if (int[k].cidr.split("/")[1] == "24") {
+						ip = int[k].address;
+					}
+				}
+			}
 		} else if (process.platform == "android") {
-			var ip = os.networkInterfaces().wlan0[1].address;
+			ip = os.networkInterfaces().wlan0[1].address;
 		} else {
+			console.log("Not Casting");
 			return;
 		}
 
@@ -296,7 +310,9 @@ class Globo {
 
 		this.log(u);
 
-		Cast.Init(chromecast, u);
+		Cast.Init(chromecast, u, function(...args) {
+			Globo.log(...args);
+		});
 	}
 
 	static log(...args) {
