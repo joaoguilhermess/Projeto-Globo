@@ -1,6 +1,7 @@
-import cast from "castv2";
-import Util from "./util.js";
 import mdns from "multicast-dns";
+import Util from "./util.js";
+import cast from "castv2";
+import Log from "./log.js";
 
 export default class Cast {
 	static async Init(url) {
@@ -10,7 +11,7 @@ export default class Cast {
 
 		var app = await this.getApp();
 
-		Util.log(app.appId, app.displayName);
+		Log.log(app.appId, app.displayName);
 
 		if (["E8C28D3C", "5CB45E5A"].includes(app.appId)) {
 			await this.stopApp();
