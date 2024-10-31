@@ -1,27 +1,47 @@
 import cast from "castv2";
+import Util from "./util.js";
+import mdns from "multicast-dns";
 
 export default class Cast {
-	static async Init(ip, url, log) {
+	static async Init(url) {
 		this.cast = new cast.Client();
 
-		await this.connect(ip);
+		await this.connect();
 
 		var app = await this.getApp();
 
-		log(app.appId, app.displayName);
+		Util.log(app.appId, app.displayName);
 
 		if (["E8C28D3C", "5CB45E5A"].includes(app.appId)) {
-			await this.stop();
+			await this.stopApp();
 		
-			await this.launch(url);
+			await this.launchApp(url);
 		}
 	}
 
-	static async connect(ip) {
+	static async search() {
+		return await new Promise(function(resolve, reject) {
+			var dns = mdns();
+
+			dns.on("response", function(response) {
+				var list = response.additionals;
+
+				dns.destroy();
+
+				resolve(list[list.length - 1].data);
+			});
+
+			dns.query("_googlezone._tcp.local");
+		});
+	}
+
+	static async connect() {
+		var host = await this.search();
+
 		var context = this;
 
 		await new Promise(function(resolve, reject) {
-			context.cast.connect(ip, resolve);
+			context.cast.connect(host, resolve);
 		});
 
 		this.connection = this.cast.createChannel("sender-0", "receiver-0", "urn:x-cast:com.google.cast.tp.connection", "JSON");
@@ -31,43 +51,46 @@ export default class Cast {
 		this.connection.send({type: "CONNECT"});
 
 		setInterval(function() {
-			context.heartbeat.send({type: "PING"});
+			context.beat();
 		}, 5000);
+
+		this.beat();
+	}
+
+	static beat() {
+		this.heartbeat.send({type: "PING"});
+	}
+
+	static async getStatus() {
+		var context = this;
+
+		var r;
+
+		var status = await new Promise(function(resolve, reject) {
+			r = resolve;
+			context.receiver.on("message", resolve);
+		});
+
+		this.receiver.off("message", r);
+
+		return status;
 	}
 
 	static async getApp() {
 		this.receiver.send({type: "GET_STATUS", requestId: 1});
 
-		var context = this;
-
-		var r;
-
-		var status = await new Promise(function(resolve, reject) {
-			r = resolve;
-			context.receiver.on("message", resolve);
-		});
-
-		this.receiver.off("message", r);
+		var status = await this.getStatus();
 
 		return status.status.applications[0];
 	}
 
-	static async stop() {
+	static async stopApp() {
 		this.receiver.send({type: "STOP", requestId: 1});
 
-		var context = this;
-
-		var r;
-
-		var status = await new Promise(function(resolve, reject) {
-			r = resolve;
-			context.receiver.on("message", resolve);
-		});
-
-		this.receiver.off("message", r);
+		await this.getStatus();
 	}
 
-	static async launch(url) {
+	static async launchApp(url) {
 		this.receiver.send({
 			type: "LAUNCH",
 			appId: "5CB45E5A",

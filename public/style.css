@@ -1,0 +1,56 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+}
+
+html {
+	display: flex;
+}
+
+body {
+	display: flex;
+	background-color: #000000;
+	overflow: hidden;
+}
+
+video {
+	display: flex;
+	z-index: 100;
+	position: absolute;
+}
+
+html, body, video {
+	min-height: 100vh;
+	min-width: 100vw;
+	height: 100vh;
+	width: 100vw;
+	max-height: 100vh;
+	max-width: 100vw;
+}
+
+.video-js {
+	display: none !important;
+	visibility: hidden !important;
+	background: transparent !important;
+}
+
+.vjs-loading-spinner {
+	display: none !important;
+}
+
+.loading {
+	display: flex;
+	height: 100vh;
+	width: 100vw;
+	position: absolute;
+	justify-content: start;
+	align-items: end;
+	font-weight: 300;
+	font-size: 5vw;
+	z-index: 0;
+	color: #ffffff;
+	padding: 0.5em;
+}
