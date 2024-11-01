@@ -35,6 +35,8 @@ export default class Globo {
 	static async getBase() {
 		while (true) {
 			try {
+				Log.log("Fetching Base Url");
+
 				var f = await fetch("https://playback.video.globo.com/v4/video-session", {
 					"headers": {
 						"accept": "*/*",
@@ -67,6 +69,8 @@ export default class Globo {
 		Server.registryScript("/playlist.m3u8", async function(request, response) {
 			while (true) {
 				try {
+					Log.log("Fetching Playlist");
+
 					var f = await fetch(context.baseUrl + "playlist.m3u8", {
 						"headers": {
 							"accept": "*/*",
@@ -106,6 +110,8 @@ export default class Globo {
 
 		Server.registryScript("/m3u8/ts/*", async function(request, response) {
 			try {
+				Log.log("Fetching Slice");
+
 				var f = await fetch(context.baseUrl + decodeURIComponent(request.url).split("/")[3], {
 					"headers": {
 						"accept": "*/*",
@@ -131,6 +137,8 @@ export default class Globo {
 
 		Server.registryScript("/m3u8/*", async function(request, response) {
 			try {
+				Log.log("Fetching Stream");
+
 				var f = await fetch(context.baseUrl + decodeURIComponent(request.url).split("/")[2], {
 					"headers": {
 						"accept": "*/*",

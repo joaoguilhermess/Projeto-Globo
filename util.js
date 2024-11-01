@@ -57,6 +57,8 @@ export default class Util {
 					if (current.family == "IPv4") {
 						if (!current.internal) {
 							if (current.address[0] == "1") {
+								Log.log(current.address);
+								
 								return current.address;
 							}
 						}

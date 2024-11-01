@@ -11,7 +11,7 @@ export default class Cast {
 
 		var app = await this.getApp();
 
-		Log.log(app.appId, app.displayName);
+		Log.log("Current App:", app.appId, app.displayName);
 
 		if (["E8C28D3C", "5CB45E5A"].includes(app.appId)) {
 			await this.stopApp();
@@ -21,6 +21,8 @@ export default class Cast {
 	}
 
 	static async search() {
+		Log.log("Searching for ChromeCast");
+
 		return await new Promise(function(resolve, reject) {
 			var dns = mdns();
 
@@ -38,6 +40,8 @@ export default class Cast {
 
 	static async connect() {
 		var host = await this.search();
+
+		Log.log("Casting To:", host);
 
 		var context = this;
 
@@ -86,12 +90,16 @@ export default class Cast {
 	}
 
 	static async stopApp() {
+		Log.log("Stopping Current App");
+
 		this.receiver.send({type: "STOP", requestId: 1});
 
 		await this.getStatus();
 	}
 
 	static async launchApp(url) {
+		Log.log("Launching:", url);
+
 		this.receiver.send({
 			type: "LAUNCH",
 			appId: "5CB45E5A",

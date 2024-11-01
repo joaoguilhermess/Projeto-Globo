@@ -1,13 +1,14 @@
 import Server from "./server.js";
 import Globo from "./globo.js";
 import Util from "./util.js";
+import Cast from "./cast.js";
 import Log from "./log.js";
 
 class Main {
 	static async Init() {
 		this.port = 5000;
 
-		Log.Init(true);
+		Log.Init(false);
 
 		Server.Init();
 
@@ -19,10 +20,12 @@ class Main {
 
 		await Globo.Init();
 
+		var context = this;
+
 		Server.start(this.port, async function() {
 			Log.log("Ready");
 
-			await Cast.Init("http://" + Util.getHost() + ":" + this.port);
+			await Cast.Init("http://" + Util.getHost() + ":" + context.port);
 		});
 	}
 }
