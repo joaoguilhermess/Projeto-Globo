@@ -8,7 +8,7 @@ class Main {
 	static async Init() {
 		this.port = 5000;
 
-		Log.Init(false);
+		Log.Init(true);
 
 		Server.Init();
 

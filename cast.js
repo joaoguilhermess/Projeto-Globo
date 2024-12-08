@@ -11,9 +11,11 @@ export default class Cast {
 
 		var app = await this.getApp();
 
-		Log.log("Current App:", app.appId, app.displayName);
+		if (app) {
+			Log.log("Current App:", app.appId, app.displayName);
+		}
 
-		if (["E8C28D3C", "5CB45E5A"].includes(app.appId)) {
+		if (["E8C28D3C", "5CB45E5A"].includes(app.appId) || app.appId == undefined) {
 			await this.stopApp();
 		
 			await this.launchApp(url);
@@ -86,7 +88,9 @@ export default class Cast {
 
 		var status = await this.getStatus();
 
-		return status.status.applications[0];
+		if (status.status.applications) {
+			return status.status.applications[0];
+		}
 	}
 
 	static async stopApp() {

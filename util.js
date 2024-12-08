@@ -1,5 +1,6 @@
 import {v4 as uuid} from "uuid";
 import {Readable} from "stream";
+import Log from "./log.js";
 import path from "path";
 import fs from "fs";
 import os from "os";
