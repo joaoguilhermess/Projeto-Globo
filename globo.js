@@ -35,7 +35,7 @@ export default class Globo {
 	static async getBase() {
 		while (true) {
 			try {
-				Log.log("Fetching Base Url");
+				var stopWatch = Log.stopWatch("Base Url");
 
 				var f = await fetch("https://playback.video.globo.com/v4/video-session", {
 					"headers": {
@@ -54,6 +54,8 @@ export default class Globo {
 
 				this.baseUrl = json.sources[0].url.split("/").slice(0, -1).join("/") + "/";
 
+				stopWatch();
+
 				return;
 			} catch (e) {
 				Log.error(e);
@@ -69,7 +71,7 @@ export default class Globo {
 		Server.registryScript("/playlist.m3u8", async function(request, response) {
 			while (true) {
 				try {
-					Log.log("Fetching Playlist");
+					var stopWatch = Log.stopWatch("Playlist");
 
 					var f = await fetch(context.baseUrl + "playlist.m3u8", {
 						"headers": {
@@ -95,6 +97,8 @@ export default class Globo {
 
 					response.send(text);
 
+					stopWatch();
+
 					return;
 				} catch (e) {
 					Log.error(e);
@@ -110,7 +114,7 @@ export default class Globo {
 
 		Server.registryScript("/m3u8/ts/*", async function(request, response) {
 			try {
-				Log.log("Fetching Slice");
+				var stopWatch = Log.stopWatch("Slice");
 
 				var f = await fetch(context.baseUrl + decodeURIComponent(request.url).split("/")[3], {
 					"headers": {
@@ -123,11 +127,13 @@ export default class Globo {
 				response.set("Cache-Control", "private, max-age=0, no-cache");
 				response.set("Content-Type", "video/MP2T");
 
+				response.on("finish", stopWatch);
+
 				Util.pipe(f, response);
 			} catch (e) {
 				Log.error(e);
 
-				response.sendStatus(404);
+				response.sendStatus(500);
 			}
 		});
 	}
@@ -137,7 +143,7 @@ export default class Globo {
 
 		Server.registryScript("/m3u8/*", async function(request, response) {
 			try {
-				Log.log("Fetching Stream");
+				var stopWatch = Log.stopWatch("Stream");
 
 				var f = await fetch(context.baseUrl + decodeURIComponent(request.url).split("/")[2], {
 					"headers": {
@@ -160,7 +166,7 @@ export default class Globo {
 				if (!context.started[session]) {
 					text = text.split("\n");
 
-					text = text.slice(0, -(1 + (2 * 10)));
+					text = text.slice(0, -(1 + (2 * 12)));
 
 					text.push("");
 
@@ -172,10 +178,12 @@ export default class Globo {
 				response.set("Cache-Control", "private, max-age=0, no-cache");
 				
 				response.send(text);
+
+				stopWatch();
 			} catch (e) {
 				Log.error(e);
 
-				response.sendStatus(404);
+				response.sendStatus(500);
 			}
 		});
 	}

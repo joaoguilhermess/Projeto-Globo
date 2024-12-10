@@ -14,4 +14,14 @@ export default class Log {
 			console.error("Error:", ...args);
 		}
 	}
+
+	static stopWatch(...args) {
+		var start = performance.now();
+
+		var context = this;
+
+		return function() {
+			context.log(...args, Math.floor(performance.now() - start) + "ms");
+		};
+	}
 }

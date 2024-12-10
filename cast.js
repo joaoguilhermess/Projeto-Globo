@@ -15,10 +15,13 @@ export default class Cast {
 			Log.log("Current App:", app.appId, app.displayName);
 		}
 
-		if (["E8C28D3C", "5CB45E5A"].includes(app.appId) || app.appId == undefined) {
+		// if (["E8C28D3C", "5CB45E5A"].includes(app.appId) || app.appId == undefined) {
+		if (["E8C28D3C"].includes(app.appId) || app.appId == undefined) {
 			await this.stopApp();
 		
 			await this.launchApp(url);
+		} else if (app) {
+			Log.log("Ignoring App");
 		}
 	}
 
@@ -33,7 +36,11 @@ export default class Cast {
 
 				dns.destroy();
 
-				resolve(list[list.length - 1].data);
+				for (let i = 0; i < list.length; i++) {
+					if (typeof list[i].data == "string") {
+						return resolve(list[i].data);
+					}
+				}
 			});
 
 			dns.query("_googlezone._tcp.local");

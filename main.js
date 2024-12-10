@@ -8,7 +8,12 @@ class Main {
 	static async Init() {
 		this.port = 5000;
 
+		// Log.Init(process.platform != "android");
 		Log.Init(true);
+
+		process.on("uncaughtException", function(e) {
+			Log.log("ABSURD:", e);
+		});
 
 		Server.Init();
 
