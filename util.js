@@ -57,10 +57,14 @@ export default class Util {
 
 					if (current.family == "IPv4") {
 						if (!current.internal) {
-							if (current.address[0] == "1") {
-								Log.log("Local Address:", current.address);
-								
-								return current.address;
+							let args = current.address.split(".");
+
+							if (args[0][0] == "1") {
+								if (args[2] == "0") {
+									Log.log("Local Address:", current.address);
+									
+									return current.address;
+								}
 							}
 						}
 					}
