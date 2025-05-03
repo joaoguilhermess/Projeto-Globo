@@ -28,9 +28,11 @@ class Main {
 		var context = this;
 
 		Server.start(this.port, async function() {
-			Log.log("Ready");
+			var url = "http://" + Util.getHost() + ":" + context.port;
 
-			await Cast.Init("http://" + Util.getHost() + ":" + context.port);
+			Log.log("Ready At:", url);
+
+			await Cast.Init(url);
 		});
 	}
 }
